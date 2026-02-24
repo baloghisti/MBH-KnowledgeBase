@@ -6,16 +6,45 @@ BPMN (Business Process Model and Notation): Az üzleti folyamatok vizuális lek�
 UML (Unified Modeling Language): Rendszerterveknél elengedhetetlen (pl. Sequence diagramok az entitások közötti kommunikációhoz, Class diagramok az adatstruktúrához). 
 Enterprise Architect (EA): Egy robusztus modellező eszköz, amely lehetővé teszi a komplex architektúrák kezelését és a követelmények nyomon követhetőségét (traceability). 
 User Story-k: Agilis környezetben (Scrum/Kanban) a fejlesztési egységek definiálása, elfogadási kritériumokkal (Acceptance Criteria) kiegészítve. 
-2. Interfész tervezés és AdatkommunikációEz a szakma technikai "kemény magja". A leírás alapján nem elég a felületi ismeret, mélyebb megértés szükséges:REST API: Az erőforrás-alapú kommunikáció tervezése (HTTP metódusok, státuszkódok, endpoint struktúra). 
+2. Interfész tervezés és AdatkommunikációEz a szakma technikai "kemény magja". A leírás alapján nem elég a felületi ismeret, mélyebb megértés szükséges: 
+REST API: Az erőforrás-alapú kommunikáció tervezése (HTTP metódusok, státuszkódok, endpoint struktúra). 
 JSON/XML Mapping: Amikor két különböző rendszer kommunikál, az adatmezőket össze kell párosítani (pl. a Küldő rendszer birth_date mezője a Fogadó rendszer DOB mezőjének felel meg), figyelembe véve a típuskonverziókat és validációs szabályokat. 
-Üzenetküldő rendszerek (Kafka, MQ): * Kafka: Eseményvezérelt (event-driven) architektúra, ahol a skálázhatóság és a valósidejű adatfeldolgozás a cél.MQ (Message Queue): Garantált kézbesítésű, aszinkron üzenetküldés. 
-3. Architektúrális ismeretekA jelöltnek értenie kell a szoftver felépítését, hogy releváns specifikációt tudjon írni:Monolit: Egyetlen, szorosan összefüggő kódbázis. Egyszerűbb tesztelni, de nehezebb skálázni. 
+Üzenetküldő rendszerek (Kafka, MQ): * Kafka: Eseményvezérelt (event-driven) architektúra, ahol a skálázhatóság és a valósidejű adatfeldolgozás a cél. 
+MQ (Message Queue): Garantált kézbesítésű, aszinkron üzenetküldés. 
+3. Architektúrális ismeretekA jelöltnek értenie kell a szoftver felépítését, hogy releváns specifikációt tudjon írni: 
+Monolit: Egyetlen, szorosan összefüggő kódbázis. Egyszerűbb tesztelni, de nehezebb skálázni. 
 Microservices: A rendszer kisméretű, függetlenül futtatható szolgáltatásokból áll. Itt a rendszerszervezőnek az inter-service kommunikáció (hogy beszélnek egymással a modulok) megtervezése a fő feladata. 
-4. Tesztelés és ValidációA szervező felelőssége annak biztosítása, hogy a fejlesztés megfelel a specifikációnak.Eszközök: * Postman/SoapUI: API-k manuális és automatizált tesztelésére. 
+4. Tesztelés és ValidációA szervező felelőssége annak biztosítása, hogy a fejlesztés megfelel a specifikációnak. 
+Eszközök: * Postman/SoapUI: API-k manuális és automatizált tesztelésére. 
 JMeter: Elsősorban terheléses tesztelésre, de funkcionális tesztekre is használható.SQL ismeret: Elengedhetetlen az adatbázis-szintű ellenőrzéshez (pl. bekerült-e a rekord, helyes-e az adatkonverzió). 
 Szakmai összefoglaló táblázatTerületKulcskompetenciaMiért kritikus?AnalízisUser Story, Backlog groomingHogy a fejlesztő pontosan tudja, mit kell kódolni. 
 Tervezés API Design, Message MappingHogy a rendszerek hiba nélkül tudjanak adatot cserélni. 
 Modellezés BPMN, UML, EAA vizuális logika segít elkerülni a logikai bukfenceket.MinőségSQL, Postman, TesztmódszertanA "készen van" definíciójának (Definition of Done) betartása.Mit várnak el egy ilyen szintű jelölttől? 
 Egy ilyen profilú szakembertől elvárják, hogy ne csak leírja, amit az üzlet kér, hanem proaktívan javasoljon technikai megoldásokat. 
 Például: "Ha ezt a funkciót REST API helyett Kafka topikra tesszük, csökkentjük a rendszerek közötti függőséget és növeljük a rendelkezésre állást."
+
+A három terület a modern rendszerszervezés technológiai tartóoszlopa. Részletesen, rendszerszervezői szemüveggel nézzük végig ezeket a pontokat. 
+1. REST API vs. Kafka: Szinkron és Aszinkron különbségekA különbség lényege a csatolás (coupling) mértéke és az időbeliség. 
+REST API (Szinkron): Ez egy "kérdés-felelet" alapú modell. Ha az 'A' rendszer adatot küld a 'B'-nek, meg kell várnia a választ. 
+Ha a 'B' rendszer éppen karbantartás alatt áll vagy túlterhelt, az 'A' rendszer is hibaüzenetet kap vagy "megfagy" a várakozás közben. 
+Ezt nevezzük szoros csatolásnak.Kafka (Aszinkron/Eseményvezérelt): Itt a "Publish-Subscribe" modell érvényesül. 
+Az 'A' rendszer (Producer) bedobja az üzenetet egy Kafka topikba, és megy tovább a dolgára. 
+A 'B' rendszer (Consumer) akkor veszi ki onnan, amikor tudja. Miért növeli a rendelkezésre állást?Ha a fogadó fél (Consumer) 10 percre leáll, az adatok nem vesznek el, hanem ott várnak a Kafka-ban. 
+Amint a rendszer újraindul, onnan folytatja a feldolgozást, ahol abbahagyta. Nincs "széteső" üzleti folyamat a hálózati kimaradások miatt. 
+2. Egy professzionális REST API specifikáció felépítése Rendszerszervezőként a specifikációnak elég részletesnek kell lennie ahhoz, hogy a fejlesztő és a tesztelő is pontosan tudja a dolgát. 
+Egy jó specifikáció elemei:A. Alapadatok és EndpointMetódus: GET, POST, PUT, PATCH, DELETE URL struktúra: 
+pl. /api/v1/customers/{customer_id}/orders 
+Leírás: Mi a végpont üzleti célja?B. Header és HitelesítésSzükséges fejlécek (pl. Content-Type: application/json, Authorization: Bearer <token>). 
+C. Request (Kérés) paraméterekPath parameters: Az URL-be épített változók. Query parameters: Szűréshez, lapozáshoz (pl. ?status=ACTIVE). 
+Request Body: A JSON struktúra mezőszintű leírása (típus, kötelezőség, validációs szabályok – pl. "csak szám", "max 10 karakter"). 
+D. Response (Válasz) struktúraSikeres válasz (200 OK, 201 Created) sémája.Hibaágak (400 Bad Request, 401 Unauthorized, 404 Not Found, 500 Server Error) és a hozzájuk tartozó hibaüzenet-formátumok. 
+3. Kafka Mapping logika mélyebbenA mapping (leképezés) az a folyamat, amikor meghatározzuk, hogy a forrásrendszer adataiból hogyan álljon össze a Kafka-ba kerülő üzenet (vagy fordítva). 
+A. Üzenet struktúra (Schema)Kafka esetében gyakran Avro vagy JSON Schema alapú leírókat használunk. 
+A mapping dokumentációban rögzíteni kell:Key (Kulcs): Mi alapján particionálja a Kafka az adatot? (pl. customer_id – ez biztosítja, hogy egy ügyfél üzenetei mindig sorrendben érkezzenek meg). 
+Value (Érték/Payload): Maga az üzleti adat.B. Mapping táblázat (Példa)Rendszerszervezőként egy ilyen táblázatot kell készítened: 
+Forrás mező (Legacy DB)Kafka Field (Avro Schema)TípusLogika / TranszformációU_NEVcustomerNameString 
+Összefűzés: U_VEZETEKNEV + " " + U_KERESZTNEVSZUL_DATbirthDateISO DateÁtalakítás: YYYYMMDD -> YYYY-MM-DDSTATUS_IDisActiveBooleanMapping: Ha 10 -> true, minden más -> false 
+C. Error Handling a Mapping soránMi történik, ha a forrásrendszerből hibás adat érkezik? 
+Dead Letter Topic (DLT): Ha az üzenet nem felel meg a sémának vagy a mapping logika elbukik, az üzenetet egy külön "hibagyűjtő" topikba irányítjuk, hogy ne akassza meg a fő feldolgozási láncot. 
+Hogyan tovább? Ez a tudás elengedhetetlen a rendszertervek (System Design) készítéséhez.
 
