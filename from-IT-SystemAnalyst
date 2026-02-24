@@ -48,3 +48,29 @@ C. Error Handling a Mapping soránMi történik, ha a forrásrendszerből hibás
 Dead Letter Topic (DLT): Ha az üzenet nem felel meg a sémának vagy a mapping logika elbukik, az üzenetet egy külön "hibagyűjtő" topikba irányítjuk, hogy ne akassza meg a fő feldolgozási láncot. 
 Hogyan tovább? Ez a tudás elengedhetetlen a rendszertervek (System Design) készítéséhez.
 
+Hogyan kapcsolódik össze a REST API, a Logikai Vizsgálat és a Kafka egyetlen folyamatban.Tételezzük fel, hogy egy Banki Mobilalkalmazás számára tervezünk egy "Cím módosítás" funkciót. 
+1. Sequence Diagram: A folyamat architektúrájaAz alábbi szekvencia-diagram azt mutatja be, hogyan válik el a szinkron és az aszinkron szakasz. 
+Az ügyfél azonnali visszajelzést kap (202 Accepted), de az adatok tényleges frissítése a háttérben, Kafka üzeneteken keresztül történik. 
+A folyamat lépései (Rendszerszervezői szemmel):Client -> API Gateway: Az ügyfél elküldi a PUT /customers/{id}/address kérést. 
+Validation: Az API réteg validálja a JSON struktúrát (pl. irányítószám formátuma).Producer Service: Ha a validáció sikeres, a szolgáltatás generál egy eseményt (Event). 
+Kafka Topic: Az esemény bekerül a customer-data-changes topikba.Response 202: A rendszer rögtön válaszol a kliensnek: "Kérését befogadtuk feldolgozásra." 
+(Ez növeli a felhasználói élményt, mert nem kell megvárni a lassú háttérrendszereket). 
+Consumer Services: A háttérben a Könyvelés, a CRM és a Marketing rendszerek (Consumerek) egymástól függetlenül kiolvassák az üzenetet és frissítik a saját adatbázisaikat. 
+2. REST API Specifikáció (Konkrét példa)Rendszerszervezőként így adnád át a fejlesztőnek a végpontot: 
+Endpoint: PUT /v1/customers/{customer_id}/addressRequest Header: Authorization: Bearer <JWT_TOKEN>Content-Type: application/jsonRequest Body (JSON):JSON{
+  "zipCode": "1117",
+  "city": "Budapest",
+  "street": "Október huszonharmadika utca",
+  "houseNumber": "8",
+  "effectiveDate": "2026-03-01"
+}
+Validációs szabályok:zipCode: Kötelező, string, pontosan 4 számjegy.effectiveDate: Nem lehet korábbi a mai dátumnál. 
+Hibaág: Ha a customer_id nem létezik -> 404 Not Found. 
+3. Kafka Mapping Logika (Transzformáció)Amikor a fenti API hívás beérkezik, a Producer service egy Kafka üzenetet készít. 
+Itt dől el, mi lesz a "Key" és mi a "Value".Key Mapping:Key: customer_id (pl. CUST-99821)Miért? Hogy az ugyanahhoz az ügyfélhez tartozó összes módosítás sorrendben érkezzen meg a Consumer-hez. 
+Value Mapping (Avro/JSON Schema):Itt történik az adatgazdagítás (Data Enrichment). A Kafka üzenetbe olyan adatokat is beteszünk, amik az API kérésben nem voltak benne, de a fogadó rendszereknek szükségük van rá: 
+Cél mező (Kafka) Forrás / LogikaPélda értékeventIdUUID generátor550e8400-e29b...eventTypeKonstansADDRESS_CHANGEDcustomerIdPath paraméterbőlCUST-99821addressRequest Body-ból (objektum){ "city": "Budapest", ... }timestampRendszeridő (UTC)2026-02-24T20:00:00ZsourceSystemKonstansMOBILE_APP 
+4. Miért jobb ez így? (Összegzés)Ha a CRM rendszer (Consumer) éppen áll egy adatbázis-frissítés miatt: 
+REST API esetén: A mobilalkalmazás hibaüzenetet dobna az ügyfélnek: "Sajnos nem sikerült a mentés". 
+Kafka esetén: A mobilalkalmazás sikeresen lefut. Az üzenet várakozik a Kafka-ban. 
+Amint a CRM újra elindul, 5 másodperc alatt feldolgozza a várakozó üzeneteket. Az ügyfél semmit nem vesz észre a hibából.
