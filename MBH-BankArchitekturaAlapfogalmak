@@ -1,0 +1,523 @@
+MBH Bank Architektúra Alapfogalmak:
+
+Solutions Architectként az MBH Banknál egy rendkívül komplex, több jogelőd (MKB, Takarékbank, Budapest Bank) rendszereiből összegyúrt ökoszisztémát kell átlátnod. Ez a „fúziós örökség” adja a munka nehézségét és szépségét is.
+
+Az alábbiakban strukturáltan, szakmai mélységgel foglaltam össze a kért fogalmakat és a banki architektúra alapköveit.
+
+1. Fizetési rendszerek és szabványok (Interbank & Intrabank)
+SEPA (Single Euro Payments Area)
+Az egységes eurófizetési övezet. Technikai értelemben az MBH-nak meg kell felelnie az ISO 20022 szabványnak (pénzügyi üzenetküldés).
+
+Architect szempont: A kimenő/bejövő EUR utalásoknak a SEPA Credit Transfer (SCT) vagy Instant (SCT Inst) sémán keresztül kell futniuk, ami validációs és konverziós logikát igényel a Core rendszer és a SWIFT/EBA Clearing kapuk között.
+
+GIRO (BKR - Bankközi Klíring Rendszer)
+A magyarországi belföldi forintátutalások elszámolóháza.
+
+IG1 (Éjszakai elszámolás): Kötegelt (batch) feldolgozás, naponta többször, de nem azonnali.
+
+IG2 (Napközbeni többszöri elszámolás): 2012-ben indult, óránkénti ciklusokkal.
+
+IG3 (Azonnali Fizetési Rendszer - AFR): A legfontosabb modern architektúrális elem. 5 másodpercen belüli teljesülést vár el a nap 24 órájában. Architectként itt a high-availability és az alacsony latencia a kulcs.
+
+IBAN (International Bank Account Number)
+Nemzetközi bankszámlaszám-formátum. Magyarországon 28 karakter. Tartalmazza az országkódot, ellenőrző számokat és a belföldi számlaszámot (GIRO kód + egyedi azonosító).
+
+2. Infrastruktúra és "Tornyok" (Az MBH öröksége)
+A fúzió során az MBH három fő adatközponti/székházi lokációt és az azokhoz tartozó logikai környezeteket örökölte. Ezeket gyakran "toronyként" emlegetik, utalva a korábbi központokra:
+
+BB-torony (Budapest Bank): A Váci úti bázis. Jellemzően a korábbi GE-örökségre épülő, erősen strukturált, robusztus folyamatok és specifikus IT-biztonsági protokollok helyszíne.
+
+MKB-torony (MKB Bank): A Szabadság téri és Kassák Lajos utcai lokációk. A hagyományos vállalati és nagybanki technológiai réteget képviseli.
+
+Takarék-torony (Takarék Csoport): A korábbi takarékszövetkezeti integráció öröksége. Ide tartozik a legszélesebb kirendeltségi hálózat technológiai háttérigénye is.
+
+Solutions Architect feladat: A "tripla" infrastruktúra konszolidálása (pl. hálózati átjárhatóság, tűzfal-szabályok, közös Active Directory és SSO megoldások) jelenleg is zajló folyamat.
+
+3. Core Banking és adatfeldolgozás
+FLEXCUBE (Oracle FLEXCUBE)
+Ez az egyik legfontosabb alaprendszer (Core Banking). Az MKB és több leányvállalat alapja.
+
+Építőkövek: JAVA alapú middleware, Oracle Database háttérrel. Jellemzően a számlavezetés, hitelezés és limitkezelés fut benne.
+
+Integrációs pontok: API-kon keresztül (Soap/Rest) kommunikál az elülső frontend rendszerekkel.
+
+FLEX (Takarék-ági Core)
+A Takarékbank örökségében a Core rendszer gyakran egy korábbi, a "FLEXCUBE"-nál régebbi vagy attól elszabályozottabb "FLEX" néven futó megoldás, amely a lakossági betéteket és kártyaműveleteket kezeli.
+
+4. Back-office és megfelelőség (The "Gray Zone")
+BRS (Banki Reporting Rendszer)
+A Magyar Nemzeti Bank (MNB) és egyéb szabályozók felé történő adatszolgáltatást végző szoftver. A banki tranzakciókat és egyenlegeket a BRS "szűri" és formatálja a hivatalos statisztikai jelentésekhez.
+
+AML (Anti-Money Laundering)
+Pénzmosás elleni szűrőrendszer. Minden tranzakciónak át kell futnia egy AML motoron (pl. Actimize vagy Siron), amely figyelőlisták (PEP, szankciós listák) és mintázatok alapján blokkolhatja az utalást.
+
+SAS
+Nemcsak egy statisztikai szoftver, hanem egy egész analitikai platform. Az MBH-nál a kockázatkezelési (Risk) modellek, scoring (hitelbírálati pontszámítás) és csalásszűrés (Fraud) fut rajta.
+
+Központi DWH (Data Warehouse)
+Adattárház. Az összes "toronyból" érkező adat itt aggregálódik (ETL folyamatokon keresztül). Solutions Architectként ide kell tervezned minden olyan interfészt, ami később elemzést vagy riportálást igényel.
+
+Összefoglaló táblázat: Hogyan kapcsolódnak össze?
+Fogalom	Szerep	Érintett "Torony" / Forrás
+AFR (IG3)	Azonnali belföldi HUF utalás	Össz-banki (Központi gateway)
+FLEXCUBE	Core Banking (Számlavezetés)	Elsődlegesen MKB / Vállalati
+DWH	Adattárház / BI	Mindhárom ágból gyűjt
+SAS	Kockázatkezelés / Scoring	Központi funkció
+AML	Megfelelőség (Compliance)	Minden tranzakciót ellenőriz
+Solutions Architectként mire figyelj kiemelten?
+Integrációs komplexitás: Amikor egy új terméket vezetsz be, meg kell határoznod, melyik ági Core rendszerbe kerüljön a számlavezetés, és hogyan kapja meg az adatot a DWH.
+
+Legacy rendszerek: Sokszor találkozol majd "fekete dobozokkal", amiknek nincs dokumentációja. Itt a hálózati forgalom elemzése és a DB sémák visszafejtése lesz a barátod.
+
+Szabályozás (Compliance): Minden technikai döntésnek meg kell felelnie a MNB, GDPR és EBA ajánlásoknak.
+
+Mit szeretnél, mire fókuszáljunk legközelebb?
+Mélyebben belemenjünk az AFR (IG3) technikai architektúrájába (mikroszolgáltatások, Kafka, stb.)?
+
+Vagy inkább a FLEXCUBE integrációs lehetőségei (API Management) érdekelnek?
+
+Ön a következőt mondta:
+1. FLEXCUBE integrációs lehetőségei (API Management) érdekelnek?,
+
+2. AFR (IG3) technikai architektúrájába (mikroszolgáltatások, Kafka, stb.),
+
+3. Jó lenne valami alkalmazástérkép, vagy kapcsolódási, vagy integrációs térkép, ábra, diagram ha nem tudod lerajzolni úgy is jó ahogy szoktad...
+
+Solutions Architectként az MBH Banknál a legizgalmasabb kihívás az, hogyan kapcsold össze a modern, eseményvezérelt világot (AFR/Kafka) a robusztus, hagyományos banki magrendszerekkel (FLEXCUBE).
+
+Itt egy mélyebb technikai áttekintés a kért pontokról:
+
+1. FLEXCUBE Integrációs Lehetőségek (API Management)
+Az Oracle FLEXCUBE nem egy monolitikus "fekete doboz", hanem egy rétegelt architektúra, amely több módon is megszólítható. MBH környezetben a cél a decoupling (leválasztás), hogy a frontend ne függjön közvetlenül a Core logikától.
+
+FCUBS Web Services (SOAP/XML): Ez a natív "régi motoros". A FLEXCUBE rendelkezik egy beépített Gateway modullal, amely WSDL alapú interfészeket kínál. Bár robusztus, a teljesítménye (overhead) és a merevsége miatt ma már inkább csak belső, legacy integrációkra használják.
+
+RESTful Services: Az újabb verziók már támogatják a REST API-kat (JSON). Ezek könnyebben illeszthetők az Enterprise API Management (pl. Apigee vagy WSO2) rétegbe. Itt történik a throttling, az OAuth2 autentikáció és a naplózás.
+
+Extensibility Framework (RAD): Architectként tudnod kell, hogy a FLEXCUBE logikája bővíthető. Ha egy egyedi MBH-specifikus mezőt vagy validációt kell beépíteni, azt a "Hook" pontokon keresztül lehet megtenni, anélkül, hogy a core kódot módosítanátok.
+
+Direct DB / File Transfer: Bár architektúrális szempontból "bűn", a nagy tömegű adatok (pl. napi zárás utáni DWH exportok) még mindig közvetlen DB linkeken vagy staging táblákon keresztül mozognak.
+
+2. AFR (IG3) Technikai Architektúra
+Az Azonnali Fizetési Rendszer a bank "idegrendszere". Itt a legmagasabb az elvárás a rendelkezésre állásra (99.99%+) és a válaszidőre (másodpercek).
+
+Eseményvezérelt architektúra (Kafka): Az AFR üzenetek (ISO 20022 XML formátum) feldolgozása nem szinkron hívások láncolata, hanem egy üzenetbuszra (Apache Kafka) épül.
+
+Producerek: A csatornák (Mobilbank, Netbank).
+
+Consumers: A limitellenőrző, az AML szűrő és a Core könyvelő modul.
+
+Mikroszolgáltatások (Containerization): Az AFR komponensek (pl. másodlagos azonosító kezelő, fizetési kérelem logikája) jellemzően Docker/OpenShift környezetben futnak. Ez teszi lehetővé a skálázódást: ha jön a fizetési csúcs (pl. fizetésnap), a Kubernetes több példányt indít a validátorból.
+
+In-Memory Data Grid (IMDG): A sebesség érdekében a limitek és az egyenlegek egy része nem a lassú lemezes adatbázisból, hanem egy gyorsítótárazott (pl. Redis vagy Hazelcast) rétegből kerül ellenőrzésre a tranzakció pillanatában.
+
+3. Integrációs és Alkalmazástérkép (Logikai ábra)
+Mivel az MBH három bank fúziója, az alábbi "Target Architecture" vázlat segít megérteni a rendszerek hierarchiáját.
+
+A logikai kapcsolódási térkép:
+Kódrészlet
+graph TD
+    subgraph "Ügyfél Csatornák (Frontend)"
+        MB[Mobilbank]
+        NB[Netbank]
+        BR[Branch - Fióki frontend]
+    end
+
+    subgraph "API Management / Middleware"
+        APIGW[Enterprise API Gateway]
+        ESB[Enterprise Service Bus]
+    end
+
+    subgraph "Payment Hub (AFR/GIRO/SEPA)"
+        PH[Payment Engine]
+        KAFKA{Kafka Event Bus}
+        AML[AML / Fraud Szűrés]
+    end
+
+    subgraph "Core Banking (Back-end)"
+        FC[FLEXCUBE - MKB ág]
+        FX[FLEX - Takarék ág]
+        BB[Legacy BB Core]
+    end
+
+    subgraph "Adat & Riportálás"
+        DWH[(Központi Adattárház)]
+        BRS[Reporting / MNB]
+    end
+
+    %% Kapcsolatok
+    MB & NB & BR --> APIGW
+    APIGW --> PH
+    PH <--> KAFKA
+    KAFKA --> AML
+    PH --> FC & FX & BB
+    FC & FX & BB -- Batch/ETL --> DWH
+    DWH --> BRS
+Magyarázat a Solutions Architect szemével:
+Orkesztráció: Amikor egy ügyfél utal a mobilappban, a kérés az API Gateway-re fut be.
+
+Payment Hub: Ez a komponens dönti el, hogy a kérés IG3 (azonnali), IG1/2 (napközbeni) vagy SEPA (euró) irányba menjen.
+
+Core decoupling: A cél, hogy a Payment Hub ne tudja, melyik "torony" Core rendszere könyvel. Ő csak egy szabványos interfészt hív, az ESB (vagy API réteg) pedig elirányítja a kérést a megfelelő Core (FLEXCUBE vagy FLEX) felé.
+
+Adatfolyam: A tranzakció végén az adat bekerül a DWH-ba, ahol a SAS elvégzi a kockázati elemzést, a BRS pedig elkészíti az MNB jelentést.
+
+Hogyan tovább?
+
+Érdekelne egy konkrét Sequence Diagram (eseménysorrend), hogy mi történik pontosan egy másodperc alatt, amikor egy AFR utalás beérkezik?
+
+Vagy nézzük meg a FLEXCUBE adatbázis sémájának főbb moduljait (Customer, Accounts, Gl)?
+
+Ön a következőt mondta:
+- Klíring Rendszer jelentése?
+
+- Orkesztráció jelentése?
+
+- OCS-omnichanel jelentése és működése?
+
+- A logikai kapcsolódási térkép-et hogyan és miben rajzoljam?
+
+- egy konkrét Sequence Diagram (eseménysorrend), hogy mi történik pontosan egy másodperc alatt, amikor egy AFR utalás beérkezik?
+
+- nézzük meg a FLEXCUBE adatbázis sémájának főbb moduljait (Customer, Accounts, Gl stb.)
+
+Solutions Architectként ezek a fogalmak alkotják a napi munkád szókincsét. Haladjunk végig rajtuk szakmai mélységben, a tranzakciók logikájától az adatbázis sémákig.
+
+1. Fogalmak tisztázása
+Klíring Rendszer (Clearing System)
+A klíring a bankok közötti követelések és tartozások elszámolását jelenti. Amikor te az MBH-tól utalsz az OTP-be, a pénz nem "repül át" azonnal.
+
+Folyamat: A klíringház (itthon a GIRO Zrt.) összegyűjti a bankok egymás felé fennálló tételeit, összesíti (nettósítja), és meghatározza, ki kinek mennyivel tartozik a nap végén (vagy ciklus végén).
+
+Settlement (Teljesítés): Ez a második lépés, amikor a jegybanki számlákon ténylegesen átvezetik a pénzt (VIBER).
+
+Orkesztráció (Orchestration)
+Az IT architektúrában az orkesztráció több különálló szolgáltatás (mikroszolgáltatás vagy alrendszer) összehangolt vezérlését jelenti egy központi logika szerint.
+
+Példa: Egy hiteligénylésnél az "orkesztrátor" egymás után (vagy párhuzamosan) hívja meg a KHR-lekérdezést, a belső scoringot, a fedezetértékelést, majd ha minden OK, a szerződésgenerálót. Ha valamelyik elbukik, az orkesztrátor kezeli a hibát.
+
+OCS (Omni-Channel Solution)
+Az Omni-channel lényege az átjárhatóság. Nem csak több csatorna van (Multi-channel), hanem azok össze vannak kötve.
+
+Működése: Ha az ügyfél elkezdi a személyi kölcsön igénylést a mobilbankban, de elakad, bemehet a fiókba, ahol az ügyintéző pontosan onnan folytatja a folyamatot, ahol az ügyfél a mobilon abbahagyta.
+
+Technikai háttér: Egy központi Session Store és Process Engine kell hozzá, hogy a csatornák (Netbank, Mobil, Fiók) ugyanazt az üzleti logikát és állapotot lássák.
+
+2. Hogyan és miben rajzolj?
+Architectként a vizualizáció a legfőbb fegyvered. Az alábbi eszközöket és szabványokat javaslom:
+
+Eszközök:
+
+Enterprise Architect (Sparx): Komoly banki környezetben (mint az MBH) ez az ipari sztenderd a komplex UML és adatbázis-modellezéshez.
+
+Lucidchart / Miro: Gyors, kollaboratív vázlatokhoz, magas szintű diagramokhoz.
+
+Draw.io (diagrams.net): Ingyenes, rugalmas, jól kezelhető.
+
+Módszertan:
+
+UML (Unified Modeling Language): Sequence és Class diagramokhoz.
+
+Archimate: Ez a "banki nyelv". Kifejezetten vállalati architektúra leírására való (üzleti, alkalmazás és technológiai rétegek elkülönítése).
+
+3. AFR Sequence Diagram (Azonnali Fizetés 5 másodperce)
+Az alábbi ábra azt mutatja be, mi történik a "színfalak mögött" egy belföldi utalásnál.
+
+T=0s: Ügyfél rányom a "Küldés" gombra (Mobile App).
+
+T=0.5s: API Gateway autentikál, majd továbbítja a kérést a Payment Hub-nak.
+
+T=1.0s: Payment Hub szinkron hívással ellenőrzi a FLEXCUBE-ban a fedezetet és zárolja az összeget (Pénz még a számlán van, de már nem elkölthető).
+
+T=1.5s: AML/Fraud szűrő lefuttatja a gyors ellenőrzést.
+
+T=2.0s: A bank kiküldi a GIRO (HIRD) felé a pac-ot (ISO 20022 message).
+
+T=3.5s: A fogadó bank visszaigazol (vagy elutasít).
+
+T=4.0s: A Payment Hub véglegesíti a könyvelést a Core rendszerben (vagy feloldja a zárolást hiba esetén).
+
+T=4.5s: Push üzenet megy az ügyfélnek: "Sikeres utalás".
+
+4. FLEXCUBE Adatbázis Séma Modulok
+A FLEXCUBE egy hatalmas Oracle adatbázis (több ezer tábla). A táblák nevei általában 2-4 betűs modul-előtaggal kezdődnek.
+
+Modul kód	Elnevezés	Mire jó? (Főbb táblák/adatok)
+ST	Static Data	Törzsadatok: Ügyféladatok (STTM_CUSTOMER), számlák (STTM_CUST_ACCOUNT).
+GL	General Ledger	Főkönyv: Számlatükör, napi egyenlegek, devizaárfolyamok.
+AC	Accounts	Számlavezetési tranzakciók, forgalmi adatok (ACTB_DAILY_LOG).
+FT	Funds Transfer	Utalások adatai, feldolgozási állapotok.
+IC	Interest & Charges	Kamatszámítás és díjterhelés logikája.
+LD/LI	Loans & Deposits	Hitelek és betétek specifikus adatai (törlesztési ütemezés).
+Architect tipp: A FLEXCUBE-ban ne keress "szép" idegen kulcsokat (Foreign Keys) mindenhol. Sokszor az üzleti logika (Application Layer) kényszeríti ki az integritást, nem az adatbázis motor. A STTM_CUST_ACCOUNT tábla lesz a legfontosabb kiindulópontod, itt van az összes bankszámla alapadata.
+
+Melyik részt mélyítsük tovább?
+
+Szeretnél látni egy konkrét JSON request példát egy FLEXCUBE REST API híváshoz?
+
+Vagy nézzük meg az Omni-channel (OCS) technikai megvalósítását (pl. hogyan szinkronizálja az állapotot a Redis)?
+
+Ön a következőt mondta:
+1. SWIFT/EBA Clearing kapuk?
+
+2.  egy konkrét JSON request példát egy FLEXCUBE REST API híváshoz,
+
+3. nézzük meg az Omni-channel (OCS) technikai megvalósítását
+
+Solutions Architectként a nemzetközi fizetési forgalom és a modern integrációs minták ismerete elengedhetetlen. Haladjunk tovább a mélyvízben:
+
+1. SWIFT és EBA Clearing kapuk
+Míg a GIRO a belföldi forintot kezeli, a nemzetközi és euró forgalomhoz speciális kapukra (Gateway) van szükség.
+
+SWIFT (Society for Worldwide Interbank Financial Telecommunication):
+
+Ez nem egy elszámolóház, hanem egy biztonságos üzenetküldő hálózat.
+
+Működése: A bank belső rendszeréből (pl. FLEXCUBE) érkező fizetési utasítást egy SWIFT Gateway (pl. SWIFT Alliance Access) konvertálja MT (hagyományos) vagy MX (ISO 20022 alapú) üzenetté.
+
+Architect feladat: Biztosítani a BIC kódok validációját és a "Sanction Screening"-et (szankciós szűrés), mielőtt az üzenet elhagyja a banki hálózatot.
+
+EBA Clearing (Euro Banking Association):
+
+Ez a tényleges európai elszámolóház (hasonló a GIRO-hoz, de euróra).
+
+EURO1 / STEP2: A SEPA utalások (SCT, SCT Inst) ezeken a rendszereken keresztül futnak.
+
+Az MBH közvetlenül vagy egy levelező bankon keresztül kapcsolódik ide, hogy az euró utalások olcsón és gyorsan teljesüljenek.
+
+2. FLEXCUBE REST API: JSON Request példa
+Tegyük fel, hogy egy új front-end alkalmazásból (pl. Mobilbank) szeretnénk lekérdezni egy ügyfél számlaegyenlegét. A FLEXCUBE Rest API rétegén keresztül ez így nézhet ki:
+
+Endpoint: POST /FCUBSAccService/QueryAccountBalance
+
+Header:
+
+JSON
+{
+  "Content-Type": "application/json",
+  "X-User-Id": "MOB_USER01",
+  "X-Branch-Code": "001",
+  "X-Source-System": "MOBILE_BANK"
+}
+Request Body:
+
+JSON
+{
+  "FCUBS_BODY": {
+    "Acc-Details": {
+      "CUSTACNO": "1234567890123456",
+      "BRANCH": "001"
+    }
+  },
+  "FCUBS_HEADER": {
+    "SERVICE": "FCUBSAccService",
+    "OPERATION": "QueryAccountBalance",
+    "SOURCE": "MOBILE_BANK",
+    "USERID": "MOB_USER01",
+    "MSGSTAT": "P"
+  }
+}
+Architect megjegyzés: A FLEXCUBE válasza tartalmazni fogja a Booked Balance (könyvelt) és Available Balance (elérhető) összegeket, figyelembe véve a zárolásokat (pl. kártyás foglalások).
+
+3. Omni-channel (OCS) technikai megvalósítása
+Az OCS lényege a stateless frontend és a stateful process orchestration.
+
+Technikai stack példa:
+Process Engine (pl. Camunda): Ez tárolja a folyamat állapotát (pl. "Ügyfél a 3. lépésnél tart a hiteligénylésben").
+
+State Store (Redis): Egy ultra-gyors in-memory adatbázis, ami tárolja az ügyfél ideiglenes adatait (amit bepötyögött, de még nem mentett el a végleges adatbázisba).
+
+BFF (Backend-for-Frontend): Külön mikroszolgáltatás a mobilnak, a webnek és a fióknak, de mind ugyanazt a központi API-t hívják.
+
+Működési folyamat:
+Lépés 1: Az ügyfél a mobilon elkezdi az igénylést. A mobil app beküldi az adatokat egy REST hívással az OCS rétegnek.
+
+Lépés 2: Az OCS elmenti a folyamat azonosítóját (ProcessID) és a pillanatnyi adatokat a Redisbe.
+
+Lépés 3: Az ügyfél meggondolja magát, bemegy a fiókba.
+
+Lépés 4: Az ügyintéző beírja az ügyfél azonosítóját. A fióki rendszer lekérdezi az OCS-t: "Van folyamatban lévő ügye?".
+
+Lépés 5: Az OCS visszaadja a Camunda-ban tárolt állapotot és a Redis-ből az adatokat. Az ügyintéző képernyője előre kitöltődik.
+
+Architect kihívás: Az adatkonzisztencia. Mi történik, ha az ügyfél a mobilon és a fiókban egyszerre próbál módosítani? Itt jön képbe az optimista/pesszimista zárolás (locking) kezelése.
+
+Mi legyen a következő lépés a betanulásban?
+Nézzük meg a Zárolások (Lien/Block) kezelését a FLEXCUBE-ban (miért más az egyenleg, mint amennyit el lehet költeni)?
+
+Vagy menjünk bele mélyebben a Kafka topológiába, ami az AFR üzeneteket továbbítja a modulok között?
+
+Esetleg a Security réteg érdekel (OAuth2, JWT tokenek a banki API-knál)?
+
+Ön a következőt mondta:
+Sorban kérem:
+
+- Nézzük meg a Zárolások (Lien/Block) kezelését a FLEXCUBE-ban (miért más az egyenleg, mint amennyit el lehet költeni)?
+
+- menjünk bele mélyebben a Kafka topológiába, ami az AFR üzeneteket továbbítja a modulok között?
+
+- a Security réteg érdekel (OAuth2, JWT tokenek a banki API-knál)
+
+Ez a három téma a banki architektúra "szentháromsága": az adatkonzisztencia, a valós idejű adatmozgás és a biztonság. Solutions Architectként ezeket a mélyebb összefüggéseket kell látnod a fúziós rendszerek integrációjakor.
+
+1. Zárolások (Lien/Block) kezelése a FLEXCUBE-ban
+A banki egyenlegkezelés legfontosabb szabálya: A könyvelt egyenleg nem egyenlő a felhasználható egyenleggel.
+
+Könyvelt egyenleg (Booked Balance): Ez a "számviteli igazság". Csak akkor változik, ha egy tranzakció ténylegesen lekönyvelődik (posted).
+
+Zárolás (Lien / Amount Block): Amikor egy kártyás fizetés történik, vagy egy AFR utalás elindul, a bank azonnal "lefoglalja" az összeget.
+
+A FLEXCUBE-ban ez az Amount Block funkció.
+
+Technikailag ez egy bejegyzés a CSTB_AMOUNT_BLOCK táblában.
+
+Elérhető egyenleg (Available Balance): Ez a számított érték: Könyvelt egyenleg - Zárolások (Lien) - Minimális egyenleg (ha van) + Hitelkeret.
+
+Miért kritikus ez az Architectnek?
+Ha egy külső rendszer (pl. új mobilapp) csak a könyvelt egyenleget kérdezi le, az ügyfél azt hiheti, van még pénze, amit már elköltött a boltban (csak még nem könyvelték le). Az integráció során mindig az Available Balance-szal kell dolgozni a fedezetellenőrzésnél.
+
+2. Kafka topológia az AFR (IG3) környezetben
+Az AFR-nél a 2-5 másodperces válaszidő miatt a hagyományos "kérés-válasz" (request-response) modell túl lassú és sérülékeny. Ezért használunk eseményvezérelt (Event-driven) architektúrát Kafkával.
+
+A topológia fő elemei:
+
+Topics (Csatornák):
+
+incoming-payments: Ide érkeznek az ISO 20022 üzenetek a GIRO-tól.
+
+validation-results: Ide küldik a mikroszolgáltatások (AML, Fraud, Core) a válaszaikat.
+
+accounting-commands: A Core rendszernek szóló utasítások.
+
+Consumer Groups:
+
+AML Service Group: Figyeli az incoming-payments-t, lefuttatja a szűrést, és ír a validation-results-ba.
+
+Core Adapter Group: Csak akkor könyvel a FLEXCUBE-ban, ha a validation-results-ban minden zöld jelzést kapott.
+
+Partitioning: A számlaszám alapján particionálunk, hogy ugyanazon ügyfél utalásai mindig ugyanahhoz a feldolgozó példányhoz kerüljenek (sorrendiség megtartása).
+
+Előny: Ha a FLEXCUBE éppen lassú vagy rövid időre leáll, a Kafka puffereli az üzeneteket, így a rendszer nem "dobja el" a tranzakciót, hanem amint a Core magához tér, feldolgozza azt.
+
+3. Security réteg (OAuth2 és JWT)
+A banki API-k világában (különösen a Nyílt Bankolás / PSD2 óta) az alapvető hitelesítési mód az OAuth2 + OIDC (OpenID Connect).
+
+OAuth2 Flow (Authorization Code Flow):
+
+A Mobilapp (Client) elkéri az engedélyt az Identity Provider-től (IDP).
+
+Az ügyfél azonosítja magát (Biometria/SMS).
+
+Az IDP kiad egy Access Tokent.
+
+JWT (JSON Web Token): Ez maga a token formátuma.
+
+Header: Algoritmus típusa.
+
+Payload (Claims): Itt van a lényeg: sub (ügyfél azonosító), scope (mit tehet: pl. "read:balance"), exp (lejárat).
+
+Signature: Digitális aláírás. A bank API Gateway-e (pl. Apigee) a publikus kulccsal ellenőrzi, hogy a tokent tényleg a bank IDP-je állította-e ki, és nem módosították-e azóta.
+
+Solutions Architect feladat: A Token Exchange mechanizmus tervezése. Amikor a külső API Gateway kap egy JWT-t, előfordulhat, hogy a belső (legacy) rendszerek felé azt át kell konvertálnia egy olyan azonosítóvá, amit a FLEXCUBE is megért (pl. egy technikai UserID-vé).
+
+Összegzés a betanuláshoz
+Most már látod a láncolatot:
+
+Az ügyfél bejelentkezik (OAuth2/JWT).
+
+Kezdeményez egy utalást, ami bekerül a Kafkába.
+
+A rendszer ellenőrzi a FLEXCUBE-ban az elérhető egyenleget (Available Balance).
+
+Ha van fedezet, tesz rá egy Amount Blockot (zárolás), amíg a GIRO vissza nem igazol.
+
+Mi legyen a következő?
+
+Érdekel a PSD2 / Open Banking technikai háttere (hogyan engedünk be külső feleket, pl. Revolut, az MBH-s adatokhoz)?
+
+Vagy nézzük meg a Fizetési Kérelem (Request to Pay) folyamatát az AFR-en belül?
+
+Esetleg a DWH (Adattárház) ETL folyamatai, hogyan kerülnek át ezek a tranzakciók a napi zárás után a riportokba?
+
+Ön a következőt mondta:
+1. nézzük meg a Fizetési Kérelem (Request to Pay) folyamatát az AFR-en belül
+
+2. Esetleg a DWH (Adattárház) ETL folyamatai, hogyan kerülnek át ezek a tranzakciók a napi zárás után a riportokba
+
+3. Érdekel a PSD2 / Open Banking technikai háttere (hogyan engedünk be külső feleket, pl. Revolut, az MBH-s adatokhoz)
+
+Solutions Architectként ez a három terület reprezentálja a modern banki digitális ökoszisztémát, az adatvagyont és a szabályozói nyitottságot. Haladjunk végig rajtuk technikai mélységben:
+
+1. Fizetési Kérelem (Request to Pay - RTP) folyamata az AFR-en belül
+A Fizetési Kérelem egy speciális üzenettípus az Azonnali Fizetési Rendszerben (AFR), amely nem pénzmozgás, hanem egy „felkérés” fizetésre.
+
+Üzenetszabvány: Az ISO 20022 pain.013 üzenetet használjuk.
+
+Technikai folyamat:
+
+Kezdeményezés: A kedvezményezett (pl. egy közműszolgáltató vagy egy barátod) beküldi a kérelmet a saját bankján keresztül.
+
+Központi infrastruktúra: A kérelem a GIRO központi rendszerén keresztül érkezik meg az MBH-hoz.
+
+Értesítés (Notification): Az MBH Payment Hub-ja fogadja az üzenetet, és a Kafka incoming-rtp topicján keresztül értesíti a Mobilbank backendet. Az ügyfél Push üzenetet kap.
+
+Jóváhagyás: Ha az ügyfél a mobilon rányom az "Elfogadom" gombra, a rendszer generál egy pacs.008 (azonnali utalás) üzenetet.
+
+Architect szempont: Itt a legnagyobb kihívás a kérelmek tárolása és élettartama. A fizetési kérelem 30-60 napig is érvényes lehet. Ezt nem a Core rendszerben (FLEXCUBE), hanem egy külön RTP Database-ben kell kezelni, hogy ne terheljük a főkönyvet felesleges adatokkal.
+
+2. DWH (Adattárház) és az ETL folyamatok
+A banki nap végén a tranzakciós adatoknak át kell kerülniük a jelentési rétegbe. Ez az ETL (Extract, Transform, Load) folyamat.
+
+Kinyerés (Extract): A napi zárás (EOD - End of Day) után a FLEXCUBE és más Core rendszerek staging táblákba vagy flat file-okba (pl. CSV/XML) dumpolják a napi forgalmat.
+
+Átalakítás (Transform): Ez a legkritikusabb rész. Itt történik az adatok tisztítása és normalizálása.
+
+Pl. a különböző örökölt rendszerekből érkező ügyfélkódokat össze kell fésülni egy MDM (Master Data Management) kulcs alá, hogy lássuk: a "Kovács Pál" az MKB-ágon és a Takarék-ágon ugyanaz a személy.
+
+Betöltés (Load): Az adatok bekerülnek a Data Warehouse (gyakran Oracle vagy Teradata alapú) rétegeibe:
+
+Staging Area: Nyers adatok.
+
+Core DWH: Integrált, atomi szintű adatok.
+
+Data Marts: Specifikus célú adatok (pl. Kockázatkezelési mart a SAS-nak, vagy lakossági riportok).
+
+Technológia: MBH környezetben az Informatica PowerCenter vagy az Oracle Data Integrator (ODI) a jellemző eszközök.
+
+3. PSD2 és Open Banking technikai háttere
+A PSD2 (Payment Services Directive 2) kötelezi a bankot, hogy engedjen hozzáférést a harmadik fél szolgáltatóknak (TPP - Third Party Providers, pl. Revolut, Wise, Számlázz.hu).
+
+Szerepkörök:
+
+AISP (Account Information Service Provider): Csak egyenleget és forgalmat lát (pl. pénzügyi tervező appok).
+
+PISP (Payment Initiation Service Provider): Utalást indíthat az ügyfél nevében (pl. webshopos fizetés közvetlenül bankszámláról).
+
+Technikai kapu (API Gateway):
+
+A bank egy dedikált Sandbox és Production API-t tart fent (gyakran a Berlin Group szabvány alapján).
+
+Kezelés: Amikor a Revolut bejelentkezik, egy eIDAS tanúsítvánnyal kell igazolnia magát.
+
+SCA (Strong Customer Authentication): A bank nem ad oda adatot addig, amíg az ügyfél a saját MBH-s appjában (vagy SMS-sel) jóvá nem hagyta a hozzáférést (Decoupled vagy Redirect flow).
+
+Consent Management: Ez egy külön mikroszolgáltatás, ami tárolja, hogy "Kovács Pál hozzájárult, hogy a Revolut 90 napig lássa a számlatörténetét". Az API hívásnál a rendszer először ezt a "hozzájárulási tárat" ellenőrzi.
+
+Összegzés: A Solutions Architect "napi rutinja" ezen a téren
+Amikor egy új funkciót tervezel (pl. egy új befektetési termék megjelenítése a Mobilbankban):
+
+Megtervezed az API-t (OAuth2/JWT védelemmel).
+
+Biztosítod, hogy az adatok bekerüljenek a DWH-ba a későbbi riportáláshoz.
+
+Ellenőrzöd, hogy a PSD2 hatálya alá tartozik-e (kell-e látnia a külső feleknek).
+
+Ha fizetés is van benne, illeszted az AFR/Kafka folyamatba.
+
+Mivel zárjuk a szakmai alapozót?
+
+Érdekelnének a Fúziós migráció technikai nehézségei (hogyan költöztetünk át több millió ügyfelet egyik Core-ból a másikba)?
+
+Vagy nézzük meg a Cloud stratégiát (Azure/AWS szerepe a banki architektúrában)?
+
+Esetleg egy konkrét Hibakezelési (Error Handling) stratégiát a mikroszolgáltatások között (Circuit Breaker, Retry logikák)?
