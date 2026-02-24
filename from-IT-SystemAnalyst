@@ -1,0 +1,21 @@
+Egy klasszikus, magas szintű IT-Rendszerszervező (Systems Analyst) vagy technikai fókuszú Business Analyst munkaköri leírását tükrözi. 
+A követelmények alapján a pozíció a híd szerepét tölti be az üzleti igények és a fejlesztői csapat között, méghozzá egy modern, elosztott architektúrával dolgozó környezetben. 
+Mivel kérted a részletes és szakmailag megalapozott választ, az alábbiakban pontokba szedve elemzem a kulcsfontosságú kompetenciákat és azok gyakorlati jelentőségét. 
+1. Specifikáció és Folyamatmodellezés (UML, BPMN, EA)A rendszerszervező elsődleges feladata az üzleti igények "lefordítása" technikai nyelvre. 
+BPMN (Business Process Model and Notation): Az üzleti folyamatok vizuális leképezése. Itt nem csak a "happy path" (problémamentes lefutás) dokumentálása a cél, hanem a hibakezelési ágaké is. 
+UML (Unified Modeling Language): Rendszerterveknél elengedhetetlen (pl. Sequence diagramok az entitások közötti kommunikációhoz, Class diagramok az adatstruktúrához). 
+Enterprise Architect (EA): Egy robusztus modellező eszköz, amely lehetővé teszi a komplex architektúrák kezelését és a követelmények nyomon követhetőségét (traceability). 
+User Story-k: Agilis környezetben (Scrum/Kanban) a fejlesztési egységek definiálása, elfogadási kritériumokkal (Acceptance Criteria) kiegészítve. 
+2. Interfész tervezés és AdatkommunikációEz a szakma technikai "kemény magja". A leírás alapján nem elég a felületi ismeret, mélyebb megértés szükséges:REST API: Az erőforrás-alapú kommunikáció tervezése (HTTP metódusok, státuszkódok, endpoint struktúra). 
+JSON/XML Mapping: Amikor két különböző rendszer kommunikál, az adatmezőket össze kell párosítani (pl. a Küldő rendszer birth_date mezője a Fogadó rendszer DOB mezőjének felel meg), figyelembe véve a típuskonverziókat és validációs szabályokat. 
+Üzenetküldő rendszerek (Kafka, MQ): * Kafka: Eseményvezérelt (event-driven) architektúra, ahol a skálázhatóság és a valósidejű adatfeldolgozás a cél.MQ (Message Queue): Garantált kézbesítésű, aszinkron üzenetküldés. 
+3. Architektúrális ismeretekA jelöltnek értenie kell a szoftver felépítését, hogy releváns specifikációt tudjon írni:Monolit: Egyetlen, szorosan összefüggő kódbázis. Egyszerűbb tesztelni, de nehezebb skálázni. 
+Microservices: A rendszer kisméretű, függetlenül futtatható szolgáltatásokból áll. Itt a rendszerszervezőnek az inter-service kommunikáció (hogy beszélnek egymással a modulok) megtervezése a fő feladata. 
+4. Tesztelés és ValidációA szervező felelőssége annak biztosítása, hogy a fejlesztés megfelel a specifikációnak.Eszközök: * Postman/SoapUI: API-k manuális és automatizált tesztelésére. 
+JMeter: Elsősorban terheléses tesztelésre, de funkcionális tesztekre is használható.SQL ismeret: Elengedhetetlen az adatbázis-szintű ellenőrzéshez (pl. bekerült-e a rekord, helyes-e az adatkonverzió). 
+Szakmai összefoglaló táblázatTerületKulcskompetenciaMiért kritikus?AnalízisUser Story, Backlog groomingHogy a fejlesztő pontosan tudja, mit kell kódolni. 
+Tervezés API Design, Message MappingHogy a rendszerek hiba nélkül tudjanak adatot cserélni. 
+Modellezés BPMN, UML, EAA vizuális logika segít elkerülni a logikai bukfenceket.MinőségSQL, Postman, TesztmódszertanA "készen van" definíciójának (Definition of Done) betartása.Mit várnak el egy ilyen szintű jelölttől? 
+Egy ilyen profilú szakembertől elvárják, hogy ne csak leírja, amit az üzlet kér, hanem proaktívan javasoljon technikai megoldásokat. 
+Például: "Ha ezt a funkciót REST API helyett Kafka topikra tesszük, csökkentjük a rendszerek közötti függőséget és növeljük a rendelkezésre állást."
+
