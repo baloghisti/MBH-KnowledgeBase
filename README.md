@@ -3,10 +3,11 @@
 --------------------------
 # Knowledge Base
 Személyes szakmai tudásbázis:
-- architektúra
+- architektúra (architecture)
 - cloud
 - devops
-- jegyzetek
+- jegyzetek (notes)
+- stb.
 
 ## Elvek
 - Markdown first
