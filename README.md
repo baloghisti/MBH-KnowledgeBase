@@ -1,6 +1,24 @@
 # MBH-KnowledgeBase
 # MBH-WORKs
--------------------
+--------------------------
+# Knowledge Base
+Személyes szakmai tudásbázis:
+- architektúra
+- cloud
+- devops
+- jegyzetek
+
+## Elvek
+- Markdown first
+- Simple > Clever
+- Document decisions, not only solutions
+
+## Használat
+- Tartalom: `docs/`
+- Lokálisan: `mkdocs serve`
+- Publikálás: GitHub Pages
+--------------------------
+
 Elvárt struktúra (hasonló):
 knowledge-base/
 ├─ README.md                 # mi ez a repo, hogyan használd
