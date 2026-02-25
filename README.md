@@ -1,2 +1,2 @@
-# MBH
+# MBH-KnowledgeBase
 MBH-WORKs
