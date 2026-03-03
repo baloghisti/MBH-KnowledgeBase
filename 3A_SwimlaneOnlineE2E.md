@@ -1,7 +1,7 @@
 <!-- 3/A) Swimlane – ONLINE E2E (valós idejű beküldés/validáció/ack) -->
 ```
-  ## 3/A) Swimlane – ONLINE E2E (valós idejű beküldés/validáció/ack)
   flowchart LR
+  ## 3/A) Swimlane – ONLINE E2E (valós idejű beküldés/validáció/ack)
   %% ---- Styles (optional) ----
   classDef lane fill:#f6f8fa,stroke:#c9d1d9,color:#24292f;
   classDef decision fill:#fff3cd,stroke:#d39e00,color:#533f03;
