@@ -1,7 +1,11 @@
+#### Példa mermaid kód:
 ```mermaid
 flowchart TD
   A --> B
 ```
+
+A GitHub a Mermaid-et úgy rendereli, hogy a diagram definíció **egy fenced code block-ban** van, és a nyelvazonosító **`mermaid`**.
+[1](https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/) https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/
 
 ## 3) Rendszer-szintű swimlane (E2E): OLD_SYSTEM + NEW_SYSTEM, online + batch, NAV/PMT XSD routinggal, kiinduló feltételeink alapján:
   - Mindkettő van: online + batch (az SDD sablon is számol “Online/Batch” jelöléssel interfészeknél),
@@ -11,8 +15,8 @@ flowchart TD
 
 <!-- 3/A) Swimlane – ONLINE E2E (valós idejű beküldés/validáció/ack) -->
 ## 3/A) Swimlane – ONLINE E2E (valós idejű beküldés/validáció/ack)
-```
-  flowchart LR
+```markdown
+flowchart LR
   %% ---- Styles (optional) ----
   classDef lane fill:#f6f8fa,stroke:#c9d1d9,color:#24292f;
   classDef decision fill:#fff3cd,stroke:#d39e00,color:#533f03;
@@ -155,3 +159,4 @@ https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-f
 your comment goes here
 and here
 -->
+https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams
