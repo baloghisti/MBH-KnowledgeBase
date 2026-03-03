@@ -37,31 +37,31 @@ Ez a sablon logikáját követi:
 
 ```mermaid
 flowchart TD
-    A([Indítás: BRS (és ha van SAD) rendelkezésre áll]) --> B[SDD cél: magas szintű megoldás kidolgozása<br/>technológiai területek igényeinek egységbe foglalása] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    B --> C[SDD kitöltése (fejezetek, érintett rendszerek, eltérések, stb.)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    A(["Indítás: BRS (és ha van SAD) rendelkezésre áll"]) --> B["SDD cél: magas szintű megoldás kidolgozása<br/>technológiai igények egységbe foglalása"]
+    B --> C["SDD kitöltése (fejezetek, érintett rendszerek, eltérések, stb.)"]
 
-    C --> D{Csak SA dolgozik rajta?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    D -- Igen --> E[Verzió: 0.x (draft)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    D -- Nem / Véleményezésre megy --> F[Verzió: 1.0 (első kiküldés véleményezésre)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    C --> D{"Csak SA dolgozik rajta?"}
+    D -- "Igen" --> E["Verzió: 0.x (draft 0.1, 0.9, 0.10, 0.19, 0.20 stb.)"]
+    D -- "Nem / Véleményezésre megy" --> F["Verzió: 1.0 (első kiküldés véleményezésre)"]
     E --> F
 
-    F --> G[Vélemények beérkeznek] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    G --> H[Vélemények átvezetése] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    H --> I[Verzió növelése: 1.1, 1.2, ...] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    I --> J{Minden vélemény átvezetve?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    J -- Nem --> F
-    J -- Igen --> K[Verzió: 2.0 (következő véleményezendő<br/>vagy végleges jóváhagyandó)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    K --> L[SDD elfogadás és lezárás] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    F --> G["Vélemények beérkeznek"]
+    G --> H["Vélemények átvezetése"]
+    H --> I["Verzió növelése: 1.1, 1.2, ..."]
+    I --> J{"Minden vélemény átvezetve?"}
+    J -- "Nem" --> F
+    J -- "Igen" --> K["Verzió: 2.0 (következő kör / végleges)"]
+    K --> L["SDD elfogadás és lezárás"]
 
-    L --> M{Fejlesztés megvalósult 3 hónapon belül?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    M -- Nem --> N[SDD kötelező felülvizsgálat] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    M -- Igen --> O([Zárva]) 
+    L --> M{"Fejlesztés megvalósult 3 hónapon belül?"}
+    M -- "Nem" --> N["SDD kötelező felülvizsgálat"]
+    M -- "Igen" --> O(["Zárva"])
 
-    L --> P{Visszanyitás szükséges?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    P -- SAD módosul --> Q[SDD visszanyitás] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    P -- IDD visszajelzés: új rendszert kell felvenni,<br/>mert új adatot kezel/tárol/feldolgoz --> Q [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    P -- Csak szolgáltatást vesz igénybe,<br/>de új adatot figyelmen kívül hagy --> R([Nem visszanyitandó]) [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
-    P -- SRS közben eltérő megvalósítás,<br/>de SAD nem módosul --> S[Eltérés dokumentálása SRS-ben;<br/>SRS véleményezés SA-nak] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    L --> P{"Visszanyitás szükséges?"}
+    P -- "SAD módosul" --> Q["SDD visszanyitás"]
+    P -- "IDD: új rendszer kell (új adatot kezel/tárol/feldolgoz)" --> Q
+    P -- "Új adatot figyelmen kívül hagy (nincs fejlesztés)" --> R(["Nem visszanyitandó"])
+    P -- "SRS eltér, de SAD nem módosul" --> S["Eltérés dokumentálása SRS-ben<br/>SRS véleményezés SA-nak"]
 
     Q --> C
 ```
