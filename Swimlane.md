@@ -1,11 +1,70 @@
-#### Példa mermaid kód:
+
+A GitHub a Mermaid-et úgy rendereli, hogy a diagram definíció **egy fenced code block-ban** van, és a nyelvazonosító **`mermaid`**.
+[1](https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/) https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/
+
+1) Mermaid “kód” megnyitása/renderelése GitHub + Confluence környezetben
+GitHub (natív)
+GitHub Markdownban natívan rendereli a Mermaid diagramokat, ha ```mermaid kódkockába teszed. 
+A renderelés elérhető többek közt Issues, PR, Discussions, Wiki, Markdown fájlok esetén is.
+
+#### Példa GitHub README.md-be:
 ```mermaid
 flowchart TD
   A --> B
 ```
+Markdown```mermaidflowchart TD  A --> BTovábbi vonalak megjelenítése
+> Tipp: GitHub-on a ` ```mermaid info ``` ` blokk segíthet megnézni, milyen Mermaid-verzió fut náluk.
 
-A GitHub a Mermaid-et úgy rendereli, hogy a diagram definíció **egy fenced code block-ban** van, és a nyelvazonosító **`mermaid`**.
-[1](https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/) https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/
+## 1) Confluence (tipikusan macro/app)
+Confluence-ben a Mermaid jellemzően **macro/app** formájában érhető el (“Mermaid diagram” jellegű macro), amibe bemásolod a Mermaid kódot és az **ott renderelődik**.
+[3](https://weweave.atlassian.net/wiki/spaces/CONFMERMAID/pages/904462355/Documentation)
+[4](https://marketplace.atlassian.com/apps/1222572/mermaid-charts-diagrams-for-confluence)  
+Az ilyen appok gyakran tudnak **PNG/SVG exportot**, “fullscreen”, “copy code”, stb. funkciókat is.
+[3](https://weweave.atlassian.net/wiki/spaces/CONFMERMAID/pages/904462355/Documentation)
+[4](https://marketplace.atlassian.com/apps/1222572/mermaid-charts-diagrams-for-confluence)  
+> Ha nálatok még nincs: a Marketplace-ben több Mermaid app is van (Cloud/DC/Server támogatással), pl. “Mermaid Charts & Diagrams for Confluence”.
+> [4](https://marketplace.atlassian.com/apps/1222572/mermaid-charts-diagrams-for-confluence)
+> [5](https://marketplace.atlassian.com/apps/3305228805/mermaid-diagrams-charts-for-confluence)  
+
+## 2) Az **SDD életciklus** (Mermaid)
+Ez a sablon logikáját követi:
+→ 0.x draft
+→ 1.0 véleményezés
+→ 1.1/1.2… véleményátvezetés
+→ 2.0 következő kör / végleges
+→ lezárás, + visszanyitási szabályok és 3 hónapos felülvizsgálat.
+[6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+
+```mermaid
+flowchart TD
+    A([Indítás: BRS (és ha van SAD) rendelkezésre áll]) --> B[SDD cél: magas szintű megoldás kidolgozása<br/>technológiai területek igényeinek egységbe foglalása] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    B --> C[SDD kitöltése (fejezetek, érintett rendszerek, eltérések, stb.)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+
+    C --> D{Csak SA dolgozik rajta?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    D -- Igen --> E[Verzió: 0.x (draft)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    D -- Nem / Véleményezésre megy --> F[Verzió: 1.0 (első kiküldés véleményezésre)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    E --> F
+
+    F --> G[Vélemények beérkeznek] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    G --> H[Vélemények átvezetése] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    H --> I[Verzió növelése: 1.1, 1.2, ...] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    I --> J{Minden vélemény átvezetve?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    J -- Nem --> F
+    J -- Igen --> K[Verzió: 2.0 (következő véleményezendő<br/>vagy végleges jóváhagyandó)] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    K --> L[SDD elfogadás és lezárás] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+
+    L --> M{Fejlesztés megvalósult 3 hónapon belül?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    M -- Nem --> N[SDD kötelező felülvizsgálat] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    M -- Igen --> O([Zárva]) 
+
+    L --> P{Visszanyitás szükséges?} [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    P -- SAD módosul --> Q[SDD visszanyitás] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    P -- IDD visszajelzés: új rendszert kell felvenni,<br/>mert új adatot kezel/tárol/feldolgoz --> Q [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    P -- Csak szolgáltatást vesz igénybe,<br/>de új adatot figyelmen kívül hagy --> R([Nem visszanyitandó]) [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+    P -- SRS közben eltérő megvalósítás,<br/>de SAD nem módosul --> S[Eltérés dokumentálása SRS-ben;<br/>SRS véleményezés SA-nak] [6](https://mfm-my.sharepoint.com/personal/u623162_mkb_hu/_layouts/15/Doc.aspx?sourcedoc=%7BF9509559-2FF3-46C0-BF92-43ED052BE335%7D&file=MBH_SolutionDesignDocument%20_sablon_20251031.docx&action=default&mobileredirect=true)
+
+    Q --> C
+```
 
 ## 3) Rendszer-szintű swimlane (E2E): OLD_SYSTEM + NEW_SYSTEM, online + batch, NAV/PMT XSD routinggal, kiinduló feltételeink alapján:
   - Mindkettő van: online + batch (az SDD sablon is számol “Online/Batch” jelöléssel interfészeknél),
@@ -15,8 +74,8 @@ A GitHub a Mermaid-et úgy rendereli, hogy a diagram definíció **egy fenced co
 
 <!-- 3/A) Swimlane – ONLINE E2E (valós idejű beküldés/validáció/ack) -->
 ## 3/A) Swimlane – ONLINE E2E (valós idejű beküldés/validáció/ack)
-```markdown
-flowchart LR
+```
+  flowchart LR
   %% ---- Styles (optional) ----
   classDef lane fill:#f6f8fa,stroke:#c9d1d9,color:#24292f;
   classDef decision fill:#fff3cd,stroke:#d39e00,color:#533f03;
