@@ -85,4 +85,16 @@ A teljes landscape műszaki alapja:
 
 Ez a réteg biztosítja a futtatókörnyezeteket, hálózatot, biztonságot.
 
+#### 6. EXTERNAL & STANDALONE EXTERNAL SERVICES
+Külső rendszerek, amelyekkel az MBH kapcsolódik:
+- Állami rendszerek
+(MÁK, NAV, KEK-KH, Ügyfélkapu…)
+- Pénzforgalmi rendszerek
+(GIRO, VIBER, KHR, SWIFT…)
+- Partnerrendszerek (fintech / pénzügyi szolgáltatók)
+(MeaWallet, Mastercard Access Point, Visa Online…)
+- Speciális szolgáltatók
+(IDEMIA, Microsec, Opten, Bloomberg, Refinitiv…)
+
+Minden external kapcsolat integration layeren vagy adaptoron keresztül működik.
 
