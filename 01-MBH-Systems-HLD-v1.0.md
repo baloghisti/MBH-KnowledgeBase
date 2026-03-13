@@ -35,7 +35,7 @@ A felhasználók által közvetlenül elért rendszerek:
 
 Ez a réteg minden esetben backend service-ekhez kapcsolódik.
 
-####2. SERVICE / BACKEND LAYER
+#### 2. SERVICE / BACKEND LAYER
 A csatornákat kiszolgáló üzleti logika döntő része:
 - MBH Next Channel Services
 (Android/iOS/Web Channel Services, Mobile Shared Services, Shared Channel Services)
@@ -47,5 +47,18 @@ A csatornákat kiszolgáló üzleti logika döntő része:
 (UFO Engine backend elemei, WFC workflow-k, BMS workflows stb.)
 
 Ez a réteg az üzleti működés magja.
+
+#### 3. INTEGRATION LAYER
+A rendszerek közti kommunikáció backbone-ja:
+- ESB / MQ / JMS központi integrációs komponensek
+(ESB, ESBLog, File2MQ, jmsGateway, IDA, Integration HUB…)
+- API Gateway & OpenAPI layer
+(API Gateway, OKM modul, Public Adapter, Open API…)
+- File alapú integrációk
+(FileTransfer, CafSFTP, ConnectDirect, Giro file rendszerek…)
+- Külső partnerekhez kapcsolódó adapternode-ok
+(ING, MFB, MNB, Központi adatforgalmazó ADF, GIRO, VISA/MasterCard modulok…)
+
+Ez a réteg felel a stabil, skálázható kapcsolatokért a külső és belső rendszerek között.
 
 
