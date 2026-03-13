@@ -61,4 +61,17 @@ A rendszerek közti kommunikáció backbone-ja:
 
 Ez a réteg felel a stabil, skálázható kapcsolatokért a külső és belső rendszerek között.
 
+#### 4. CORE BANKING & LEGACY SYSTEMS (Tornyok)
+A pénzintézeti működés kritikus törzs rendszerei:
+- Flexcube modules
+(CIF, Core Services, Loans & Deposits, Payments, Accounting, Treasury stb.)
+- MKB_System örökölt rendszerek
+(MobilBankár, MKBPay, NetBankár, ATMPOINT, SafeWatch, Reklám rendszerek stb.)
+- Takarék_System örökölt rendszerek
+(Electra, ePOST, Takarék Netbank, kockázati és hitelezési modulok, file szerverek…)
+- Egyéb core/tranzakciós rendszerek
+(GIRO rendszerek, SWIFT, Treasury rendszerek: Kondor/Bloomberg/BISZ…)
+
+Ezek a rendszerek jellemzően integration layeren keresztül kapcsolódnak a modern szolgáltatásokhoz.
+
 
