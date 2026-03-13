@@ -74,4 +74,15 @@ A pénzintézeti működés kritikus törzs rendszerei:
 
 Ezek a rendszerek jellemzően integration layeren keresztül kapcsolódnak a modern szolgáltatásokhoz.
 
+#### 5. INFRASTRUCTURE LAYER
+A teljes landscape műszaki alapja:
+- Virtualizációs platformok (VMware, OLVM, Ovirt)
+- Kubernetes, OpenShift, Docker
+- Identity & Access (Active Directory, Azure ADFS, Keycloak, Openshift Keycloak)
+- Monitoring (Dynatrace, Zabbix, Prometheus-Grafana, Nagios)
+- Storage & Backup (Veeam, TSM, Samba, NFS rendszerek)
+- Adatbázis platformok (Oracle RAC, MS SQL, DB2, Aurora, Informix)
+
+Ez a réteg biztosítja a futtatókörnyezeteket, hálózatot, biztonságot.
+
 
