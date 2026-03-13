@@ -99,38 +99,24 @@ Külső rendszerek, amelyekkel az MBH kapcsolódik:
 Minden external kapcsolat integration layeren vagy adaptoron keresztül működik.
 
 ### 2. A LOGIKAI RÉTEGEK KÖZTI KAPCSOLATI MODELL (HLD szinten)
+```
 [ Ügyfél (Mobile/Web/Fióki) ]
-
             │
-            
-            ▼
-            
+            ▼ 
    [ CHANNEL LAYER ]
-   
             │  REST/GraphQL
-            
             ▼
-            
    [ SERVICE / BACKEND LAYER ]
-   
             │  REST/MQ/File/API Gateway
-            
             ▼
-            
       [ INTEGRATION LAYER ]
-      
             │  MQ/File/API/ISO20022
-            
             ▼
-            
 [ CORE BANKING & LEGACY SYSTEMS ]
-
             │
-            
             ▼
-            
      [ INFRASTRUCTURE LAYER ]
-     
+```     
 
 Ez a modell lesz a későbbi PlantUML/Mermaid diagramok alapja.
 
